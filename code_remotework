@@ -1,0 +1,989 @@
+
+RemoteWork_Analysis.ipynb
+RemoteWork_Analysis.ipynb_
+Remote Work & Mental Health Analysis:
+Introduction:
+As remote work continues to shape modern workplaces, understanding its effects on mental health, stress levels, and job satisfaction is crucial. This synthetic dataset is designed to simulate real-world trends and provide a structured foundation for analysis on how work location—remote, hybrid, and onsite—impacts employees across various industries.
+
+With 5,000 AI-generated records, this dataset serves as a valuable resource for HR professionals, researchers, and data analysts looking to explore the relationship between work flexibility and employee well-being in a controlled, risk-free environment.
+
+image.png
+
+Objective:
+The primary objective of the dataset titled "Impact of Remote Work on Mental Health" is to examine how different work arrangements—such as remote, hybrid, and onsite setups—affect employees' mental health, well-being, and overall productivity. By capturing a wide range of variables including stress levels, mental health conditions, access to mental health resources, work-life balance, social isolation, and job satisfaction, the dataset aims to uncover meaningful insights into the psychological and emotional effects of remote work.
+
+Columns Description:
+Employee_ID: Unique identifier for each employee
+
+Age: Age of the employee.
+
+Gender: Employee’s gender identity.
+
+Job_Role: The role/title the employee holds (e.g., HR, Data Scientist).
+
+Industry: The industry in which the employee works (e.g., IT, Finance).
+
+Years_of_Experience: Number of years the employee has been working.
+
+Work_Location: Type of work setup — e.g., Remote, Hybrid, Onsite.
+
+Hours_Worked_Per_Week: Number of hours the employee works per week.
+
+Number_of_Virtual_Meetings: How many virtual meetings the employee attends weekly.
+
+Work_Life_Balance_Rating: Subjective rating (likely 1–5) of work-life balance.
+
+Stress_Level: Employee's reported level of stress (e.g., Low, Medium, High).
+
+Mental_Health_Condition: Any reported mental health condition (e.g., Anxiety, Depression, None).
+
+Access_to_Mental_Health_Resources: Whether the employee has access to mental health resources (Yes/No).
+
+Productivity_Change: Self-reported change in productivity (e.g., Increase, Decrease, No Change).
+
+Satisfaction_with_Remote_Work: Employee satisfaction level with remote work (e.g., Satisfied, Unsatisfied).
+
+Social_Isolation_Rating: Rating of how isolated the employee feels socially (probably numeric).
+
+Company_Support_for_Remote_Work: Rating of how much the company supports remote work.
+
+Physical_Activity: Frequency of physical activity (e.g., Daily, Weekly, None).
+
+Sleep_Quality: Self-reported sleep quality (e.g., Good, Poor, Average).
+
+Region: Geographic region of the employee (e.g., Europe, Asia, North America).
+
+Target Variable in the Dataset:
+There are few possibilities to setting down the target variables but I have choosen a "Satisfaction_with_Remote_Work".
+
+
+[ ]
+# import the libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+import warnings
+warnings.filterwarnings('ignore')
+Read the Dataset:
+
+[ ]
+# read the dataset
+df = pd.read_csv('Impact_of_Remote_Work_on_Mental_Health.csv')
+df.head()
+
+
+[ ]
+df.tail()
+
+EDA (Exploratory Data Analysis) :
+Dataset Overview:
+
+
+[ ]
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 5000 entries, 0 to 4999
+Data columns (total 20 columns):
+ #   Column                             Non-Null Count  Dtype 
+---  ------                             --------------  ----- 
+ 0   Employee_ID                        5000 non-null   object
+ 1   Age                                5000 non-null   int64 
+ 2   Gender                             5000 non-null   object
+ 3   Job_Role                           5000 non-null   object
+ 4   Industry                           5000 non-null   object
+ 5   Years_of_Experience                5000 non-null   int64 
+ 6   Work_Location                      5000 non-null   object
+ 7   Hours_Worked_Per_Week              5000 non-null   int64 
+ 8   Number_of_Virtual_Meetings         5000 non-null   int64 
+ 9   Work_Life_Balance_Rating           5000 non-null   int64 
+ 10  Stress_Level                       5000 non-null   object
+ 11  Mental_Health_Condition            3804 non-null   object
+ 12  Access_to_Mental_Health_Resources  5000 non-null   object
+ 13  Productivity_Change                5000 non-null   object
+ 14  Social_Isolation_Rating            5000 non-null   int64 
+ 15  Satisfaction_with_Remote_Work      5000 non-null   object
+ 16  Company_Support_for_Remote_Work    5000 non-null   int64 
+ 17  Physical_Activity                  3371 non-null   object
+ 18  Sleep_Quality                      5000 non-null   object
+ 19  Region                             5000 non-null   object
+dtypes: int64(7), object(13)
+memory usage: 781.4+ KB
+
+[ ]
+df.describe()
+
+
+[ ]
+df.isnull().sum()
+
+
+[ ]
+df.nunique()
+
+
+[ ]
+# duplicates
+df.duplicated().sum()
+np.int64(0)
+Distribution of Key features:
+
+
+[ ]
+# find the categorical column
+categorical_columns = df.select_dtypes(include=['object']).columns
+categorical_columns
+Index(['Employee_ID', 'Gender', 'Job_Role', 'Industry', 'Work_Location',
+       'Stress_Level', 'Mental_Health_Condition',
+       'Access_to_Mental_Health_Resources', 'Productivity_Change',
+       'Satisfaction_with_Remote_Work', 'Physical_Activity', 'Sleep_Quality',
+       'Region'],
+      dtype='object')
+
+[ ]
+# find the numerical column
+numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns
+numerical_columns
+Index(['Age', 'Years_of_Experience', 'Hours_Worked_Per_Week',
+       'Number_of_Virtual_Meetings', 'Work_Life_Balance_Rating',
+       'Social_Isolation_Rating', 'Company_Support_for_Remote_Work'],
+      dtype='object')
+Univariate Analysis:
+
+[ ]
+# pie chart
+plt.figure(figsize=(10, 6))
+df['Work_Location'].value_counts().plot(kind='pie', autopct='%1.2f%%', startangle=90)
+plt.title('Distribution of Work Location')
+plt.show()
+
+Remote workers are high percentage compared to hybrid and onsite workers.
+
+
+[ ]
+# countplot for work location and stress level
+plt.figure(figsize=(10, 6))
+sns.countplot(data=df, x='Work_Location', hue='Stress_Level')
+plt.title('Work Location vs. Stress Level')
+plt.xlabel('Work Location')
+plt.ylabel('Count')
+plt.tight_layout()
+plt.show()
+
+By observing these plots we can clearly visual the stress levels are distributed betweeen hybrid,remote and onsite.
+
+Remote: Most employees working remotely report low or medium stress levels. Very few report high stress.
+
+Onsite: There is a higher count of high-stress cases among onsite workers.
+
+Hybrid:Hybrid workers present a balanced distribution, indicating mixed experiences some benefit from flexibility, while others might struggle with inconsistency.
+
+
+[ ]
+# count the plot for job role and satisfication with remote work
+plt.figure(figsize=(10, 6))
+sns.countplot(data=df, x='Job_Role', hue='Satisfaction_with_Remote_Work')
+plt.title('Job Role vs. Satisfaction with Remote Work')
+plt.xlabel('Job Role')
+plt.ylabel('Count')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+Software Engineers & Data Scientists:
+
+These roles have a higher count of "Satisfied" employees.These jobs are typically well-suited for remote work since they rely on digital tools and independent problem-solving. Employees in these roles likely appreciate the flexibility and quiet focus time that remote work allows.
+
+HR and Sales Roles:
+
+More employees in these roles appear unsatisfied with remote work. These positions often require frequent human interaction, collaboration, and meetings. Remote work might hinder communication or make tasks feel less engaging, leading to dissatisfaction.
+
+Other Roles:
+
+These roles may vary significantly in duties. Some individuals may thrive in a remote setting while others might feel disconnected or unsupported, explaining the spread in satisfaction levels.
+
+
+[ ]
+# plot a graph betweem productivity change and work location
+plt.figure(figsize=(10, 6))
+sns.countplot(data=df, x='Productivity_Change', hue='Work_Location')
+plt.title('Productivity Change vs. Work Location')
+plt.xlabel('Productivity Change')
+plt.ylabel('Count')
+plt.tight_layout()
+plt.show()
+
+Remote Work & Productivity Increase:
+
+Employees working remotely reported a productivity increase.
+
+Hybrid Work Shows Mixed Results:
+
+Employees in hybrid settings show a more even distribution across all categories (Increase, Decrease, No Change), indicating a diverse experience with productivity changes.
+
+Onsite Work & Productivity Decrease:
+
+Those in onsite work show a larger share in the 'Decrease' category.
+
+
+[ ]
+# plot the graph between mental health condition and worklocation
+plt.figure(figsize=(10, 6))
+sns.countplot(data=df, x='Mental_Health_Condition', hue='Work_Location')
+plt.title('Mental Health Condition vs. Work Location')
+plt.xlabel('Mental Health Condition')
+plt.ylabel('Count')
+plt.tight_layout()
+plt.show()
+
+Here we can visualize that burnout and anxiety are prevalent among remote workers.Onsite workers has low mental health issues compared to remote workers. There is a balanced mental health condition in hybrid mode workers.
+
+
+[ ]
+# plot the graph between sleep quality and work location
+plt.figure(figsize=(10, 6))
+sns.countplot(data=df, x='Sleep_Quality', hue='Work_Location')
+plt.title('Sleep Quality vs. Work Location')
+plt.xlabel('Sleep Quality')
+plt.ylabel('Count')
+plt.tight_layout()
+plt.show()
+
+The graph shows that remote workers report higher "Good" or "Excellent" sleep quality than on-site workers. Conversely, if on-site workers show more "Poor" or "Fair" sleep ratings.Often, hybrid workers fall in between the extremes, showing moderate sleep quality.
+
+Bivariate Analysis:
+
+[ ]
+# plot the graph between region,stress level,work location
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=df, x='Work_Life_Balance_Rating', y='Stress_Level',hue='Work_Location')
+plt.title('Region vs. Stress Level')
+plt.xlabel('Region')
+plt.ylabel('Count')
+plt.tight_layout()
+plt.show()
+
+The boxplot shows that as work-life balance improves, stress levels tend to decrease across all work locations. Employees with poor work-life balance (ratings 1 or 2) generally report higher stress, while those with better balance (ratings 4 or 5) show lower stress on average.
+
+
+[ ]
+# analysis using scatter plot
+plt.figure(figsize=(10, 6))
+sns.scatterplot(data=df, x='Hours_Worked_Per_Week',y='Work_Life_Balance_Rating', hue ='Stress_Level')
+plt.title('Hours Worked vs. Stress Level')
+plt.xlabel('Hours Worked Per Week')
+plt.ylabel('Work_Life_Balance_Rating')
+plt.tight_layout()
+plt.show()
+
+
+I'd like to discuss the connectivity between Hours worked each week and work-life balance with stress levels.
+
+Employees works more than 45 hours per week faces the lower work life balance and higher stress.
+Employees who work between 35-40 hours have a balanced work-life balance.
+
+[ ]
+# Number_of_Virtual_Meetings vs. Social_Isolation_Rating
+
+plt.figure(figsize=(10, 6))
+sns.lineplot(data=df, x='Number_of_Virtual_Meetings', y='Social_Isolation_Rating', hue='Stress_Level')
+plt.title('Number of Virtual Meetings vs. Social Isolation Rating')
+plt.xlabel('Number of Virtual Meetings')
+plt.ylabel('Social Isolation Rating')
+plt.tight_layout()
+plt.show()
+
+High stress levels are spread across all meeting frequencies and isolation levels, suggesting that stress is influenced by more than just virtual meetings or social isolation.
+
+Low stress levels are less common, implying that most employees are experiencing at least moderate stress, possibly due to the overall demands of remote or hybrid work.
+
+
+[ ]
+# Years_of_Experience vs Stress_Level
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=df, x='Years_of_Experience', y='Stress_Level',hue ='Work_Location')
+plt.title('Years of Experience vs. Stress Level')
+plt.xlabel('Years of Experience')
+plt.ylabel('Stress Level')
+plt.tight_layout()
+plt.show()
+
+Remote work may slightly buffer stress for less experienced employees.
+
+On-site workers with more experience may be under greater stress, possibly due to expectations, workload, or resistance to remote transitions.
+
+Medium stress is for hybrid mode workers.
+
+Multivariate Analysis:
+
+[ ]
+plt.figure(figsize=(12,10))
+
+for i, col in enumerate(numerical_columns, 1):
+    plt.subplot(3, 3, i)
+    sns.histplot(df[col], kde=True, bins=20)
+    plt.title(f'Histogram & KDE: {col}')
+    plt.xlabel(col)
+    plt.ylabel('Frequency')
+
+plt.tight_layout()
+plt.show()
+
+Histogram and KDE plot show the distribution and spread of numerical values.
+
+
+[ ]
+# multivariate for this analysis
+selected_columns = [
+    'Number_of_Virtual_Meetings',
+    'Social_Isolation_Rating',
+    'Hours_Worked_Per_Week',
+    'Years_of_Experience',
+    'Work_Life_Balance_Rating',
+    'Stress_Level'
+]
+sns.pairplot(df[selected_columns], hue='Stress_Level')
+plt.tight_layout()
+plt.show()
+
+The pairplot illustrates clear trends between increased work hours and decreased work-life balance with higher stress levels.
+While the number of virtual meetings shows a varied pattern, social isolation and stress seem moderately linked, especially among remote employees.
+These visual relationships justify deeper statistical analysis or predictive modeling.
+
+[ ]
+# correlation matrix
+correlation_matrix = df[numerical_columns].corr()
+
+# heatmap
+plt.figure(figsize=(10, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f")
+plt.title('Correlation Matrix')
+plt.show()
+
+The intersection of Age and Years_of_Experience has a strong red color, with a value close to 1.00, meaning older people tend to have more experience.
+
+Work_Life_Balance_Rating and Company_Support_for_Remote_Work show a moderate red shade, indicating some positive relationship.
+
+Lighter shades or white indicate weak or no correlation between the variables.
+
+Blue cells would indicate a negative correlation, where one variable increases as the other decreases.
+
+Data Preprocessing:
+Handle missing values:
+
+[ ]
+df.isnull().sum()
+
+
+[ ]
+# fill the missing values in the dataset
+df['Mental_Health_Condition'].fillna(df['Mental_Health_Condition'].mode()[0], inplace=True)
+
+df['Physical_Activity'].fillna(df['Physical_Activity'].mode()[0], inplace=True)
+
+[ ]
+df.isnull().sum()
+
+
+[ ]
+# finding IQR for numerical columns
+Q1= df[numerical_columns].quantile(0.25)
+Q3= df[numerical_columns].quantile(0.75)
+IQR= Q3-Q1
+print(IQR)
+
+Age                                20.0
+Years_of_Experience                17.0
+Hours_Worked_Per_Week              21.0
+Number_of_Virtual_Meetings          8.0
+Work_Life_Balance_Rating            2.0
+Social_Isolation_Rating             2.0
+Company_Support_for_Remote_Work     2.0
+dtype: float64
+
+[ ]
+# finding lower bond and upper bond
+lower_bond= Q1-1.5*IQR
+upper_bond= Q3+1.5*IQR
+print(lower_bond)
+print(upper_bond)
+Age                                 1.0
+Years_of_Experience               -16.5
+Hours_Worked_Per_Week              -2.5
+Number_of_Virtual_Meetings         -8.0
+Work_Life_Balance_Rating           -1.0
+Social_Isolation_Rating            -1.0
+Company_Support_for_Remote_Work    -1.0
+dtype: float64
+Age                                81.0
+Years_of_Experience                51.5
+Hours_Worked_Per_Week              81.5
+Number_of_Virtual_Meetings         24.0
+Work_Life_Balance_Rating            7.0
+Social_Isolation_Rating             7.0
+Company_Support_for_Remote_Work     7.0
+dtype: float64
+
+[ ]
+# finding outliers
+outliers= df[numerical_columns][(df[numerical_columns]<lower_bond) | (df[numerical_columns]>upper_bond)]
+print(outliers.sum())
+Age                                0.0
+Years_of_Experience                0.0
+Hours_Worked_Per_Week              0.0
+Number_of_Virtual_Meetings         0.0
+Work_Life_Balance_Rating           0.0
+Social_Isolation_Rating            0.0
+Company_Support_for_Remote_Work    0.0
+dtype: float64
+Hence no outliers in the dataset.
+
+
+[ ]
+# Find the skewness
+df[numerical_columns].skew()
+
+Skewness score:
+
+symmetric / no skew: 0
+
+negative skew: < 0
+
+positive skew: > 0
+
+no skew - generally 0 to 0.5 in both directions can be accepted
+
+mild skew - 0.5 to 1 range in both directions
+
+high skew - above 1 in both directions
+
+Feature Engineering:
+
+[ ]
+# Make a copy of the original dataframe
+df_fe = df.copy()
+
+# Define job roles considered as 'Tech'
+tech_roles = [
+    'Software Engineer', 'Data Scientist', 'IT Support',
+    'Systems Analyst', 'Web Developer'
+]
+
+# Group job roles
+df_fe['Job_Group'] = df_fe['Job_Role'].apply(
+    lambda x: 'Tech' if x in tech_roles else 'Non-Tech'
+)
+
+# Combine Hours_Worked_Per_Week and Work_Life_Balance_Rating into a stress score
+# Lower balance rating and higher hours means higher stress
+# Add 1 to avoid division by zero
+df_fe['Work_Stress_Score'] = df_fe['Hours_Worked_Per_Week'] / (df_fe['Work_Life_Balance_Rating'] + 1)
+
+df_fe['Seniority_Index'] = df_fe['Age'] / (df_fe['Years_of_Experience'] + 1)
+
+# Result
+print(df_fe[['Job_Role', 'Job_Group', 'Hours_Worked_Per_Week', 'Work_Life_Balance_Rating', 'Work_Stress_Score', 'Seniority_Index']].head())
+
+            Job_Role Job_Group  Hours_Worked_Per_Week  \
+0                 HR  Non-Tech                     47   
+1     Data Scientist      Tech                     52   
+2  Software Engineer      Tech                     46   
+3  Software Engineer      Tech                     32   
+4              Sales  Non-Tech                     35   
+
+   Work_Life_Balance_Rating  Work_Stress_Score  Seniority_Index  
+0                         2          15.666667         2.285714  
+1                         1          26.000000        10.000000  
+2                         5           7.666667         2.565217  
+3                         4           6.400000         1.285714  
+4                         2          11.666667         1.484848  
+
+[ ]
+df_fe['Job_Group_Num'] = df_fe['Job_Group'].map({'Non-Tech': 0, 'Tech': 1})
+
+[ ]
+# Label Encoding for categorical column
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+
+for col in categorical_columns:
+  df_fe[col] = le.fit_transform(df_fe[col])
+
+[ ]
+df_fe.shape
+(5000, 24)
+
+[ ]
+# to build a new column
+# meeting per hour is Number_of_Virtual_Meetings ÷ Hours_Worked_Per_Week + 1
+df_fe['Meeting_Per_Hour'] = df_fe['Number_of_Virtual_Meetings'] / (df_fe['Hours_Worked_Per_Week'] + 1)
+df_fe.head()
+
+
+
+[ ]
+# Support_and_Balance for Company_Support_for_Remote_Work and Work_Life_Balance_Rating
+df_fe['Support_and_Balance'] = df_fe['Company_Support_for_Remote_Work'] * df_fe['Work_Life_Balance_Rating']
+df_fe.head()
+
+
+[ ]
+# Support_and_Satisfaction  Company_Support_for_Remote_Work × Satisfaction_with_Remote_Work
+df_fe['Support_and_Satisfaction'] = df_fe['Company_Support_for_Remote_Work'] * df_fe['Satisfaction_with_Remote_Work']
+df_fe.head()
+
+Feature Selection:
+
+[ ]
+# select the features and target
+
+features = df_fe.drop(['Satisfaction_with_Remote_Work','Employee_ID','Age','Years_of_Experience','Job_Role','Job_Group','Hours_Worked_Per_Week','Number_of_Virtual_Meetings','Work_Life_Balance_Rating','Company_Support_for_Remote_Work'],axis= 1)
+target = 'Satisfaction_with_Remote_Work'
+X = df_fe[features.columns]
+Y = df_fe[target]
+X.head()
+
+Satisfaction_with_Remote_Work is a target variable because it connects with all important features.
+
+
+[ ]
+# correlation matrix
+correlation_matrix = df_fe[features.columns].corr()
+
+
+# heatmap
+plt.figure(figsize=(10, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f")
+plt.title('Correlation Matrix')
+plt.show()
+
+
+[ ]
+# split the dataset training 80%
+from sklearn.model_selection import train_test_split
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+print(df_fe.shape)
+print(X_train.shape)
+print(X_test.shape)
+print(Y_train.shape)
+print(Y_test.shape)
+
+(5000, 27)
+(4000, 17)
+(1000, 17)
+(4000,)
+(1000,)
+
+[ ]
+# feature scaling
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+[ ]
+Y_train.value_counts()
+
+
+[ ]
+Y_test.value_counts()
+
+Model Building for this dataset:
+The target variable "Satisfication with remote work" contains categorical values:Satisfied,Unsatisfied and Neutral.Therefore, this is a classification problem.
+
+Logistic Regression:
+
+[ ]
+# Logistic Regression
+# import
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score,f1_score, classification_report, confusion_matrix
+
+# model fit
+lr_model = LogisticRegression(max_iter= 100)
+lr_model.fit(X_train_scaled, Y_train)
+
+# prediction
+lr_Y_pred = lr_model.predict(X_test_scaled)
+
+# find Accuracy and f1 score
+lr_accuracy_score = accuracy_score(Y_test, lr_Y_pred)
+lr_f1_score = f1_score(Y_test, lr_Y_pred,average= 'weighted')
+
+# results
+print(f'Accuracy score for Logistic Regression: {lr_accuracy_score}')
+print(f'F1 Score: {lr_f1_score}')
+print(f'Classification Report:\n {classification_report(Y_test, lr_Y_pred)}')
+print(f'Confusion Matrix:\n {confusion_matrix(Y_test, lr_Y_pred)}')
+
+
+Accuracy score for Logistic Regression: 0.914
+F1 Score: 0.9140056478093629
+Classification Report:
+               precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00       347
+           1       0.86      0.87      0.87       321
+           2       0.88      0.86      0.87       332
+
+    accuracy                           0.91      1000
+   macro avg       0.91      0.91      0.91      1000
+weighted avg       0.91      0.91      0.91      1000
+
+Confusion Matrix:
+ [[347   0   0]
+ [  0 280  41]
+ [  0  45 287]]
+Decision Tree:
+
+[ ]
+# Decision Tree
+# import
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score,f1_score, classification_report, confusion_matrix
+
+# model fit
+dt_model = DecisionTreeClassifier(max_depth= 5)
+dt_model.fit(X_train_scaled, Y_train)
+
+# prediction
+dt_Y_pred = dt_model.predict(X_test_scaled)
+dt_accuracy_score = accuracy_score(Y_test, dt_Y_pred)
+dt_f1_score = f1_score(Y_test, dt_Y_pred, average='weighted')
+
+# results
+print(f'Accuracy score for Decision Tree: {dt_accuracy_score}')
+print(f'F1 Score: {dt_f1_score}')
+print(f'Classification Report:\n {classification_report(Y_test, dt_Y_pred)}')
+print(f'Confusion Matrix:\n {confusion_matrix(Y_test, dt_Y_pred)}')
+Accuracy score for Decision Tree: 0.874
+F1 Score: 0.8686643803355903
+Classification Report:
+               precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00       347
+           1       1.00      0.61      0.76       321
+           2       0.72      1.00      0.84       332
+
+    accuracy                           0.87      1000
+   macro avg       0.91      0.87      0.87      1000
+weighted avg       0.91      0.87      0.87      1000
+
+Confusion Matrix:
+ [[347   0   0]
+ [  0 195 126]
+ [  0   0 332]]
+Random Forest:
+
+[ ]
+# Random Forest
+# import
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score,f1_score, classification_report, confusion_matrix
+
+# model fit
+rf_model = RandomForestClassifier()
+rf_model.fit(X_train_scaled, Y_train)
+
+# prediction
+rf_Y_pred = rf_model.predict(X_test_scaled)
+
+# find the accuracy and f1 score
+rf_accuracy_score = accuracy_score(Y_test, rf_Y_pred)
+rf_f1_score = f1_score(Y_test, rf_Y_pred, average='weighted')
+
+# results
+print(f'Accuracy score for Random Forest: {rf_accuracy_score}')
+print(f'F1 Score: {rf_f1_score}')
+print(f'Classification Report:\n {classification_report(Y_test, rf_Y_pred)}')
+print(f'Confusion Matrix:\n {confusion_matrix(Y_test, rf_Y_pred)}')
+Accuracy score for Random Forest: 0.944
+F1 Score: 0.9438971729125576
+Classification Report:
+               precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00       347
+           1       0.87      0.97      0.92       321
+           2       0.96      0.86      0.91       332
+
+    accuracy                           0.94      1000
+   macro avg       0.95      0.94      0.94      1000
+weighted avg       0.95      0.94      0.94      1000
+
+Confusion Matrix:
+ [[347   0   0]
+ [  0 310  11]
+ [  0  45 287]]
+Support Vector Machine:
+
+[ ]
+# Support Vector Machine
+# import
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score,f1_score, classification_report, confusion_matrix
+
+# model fit
+svm_model = SVC()
+svm_model.fit(X_train_scaled, Y_train)
+
+# prediction
+svm_Y_pred = svm_model.predict(X_test_scaled)
+
+# find accuracy and f1 score
+svm_accuracy_score = accuracy_score(Y_test, svm_Y_pred)
+svm_F1_score = f1_score(Y_test, svm_Y_pred, average='weighted')
+
+# results
+print(f'Accuracy score for Support Vector Machine: {svm_accuracy_score}')
+print(f'F1 Score: {svm_F1_score}')
+print(f'Classification Report:\n {classification_report(Y_test, svm_Y_pred)}')
+print(f'Confusion Matrix:\n {confusion_matrix(Y_test, svm_Y_pred)}')
+
+
+Accuracy score for Support Vector Machine: 0.9
+F1 Score: 0.8992861490754827
+Classification Report:
+               precision    recall  f1-score   support
+
+           0       0.96      1.00      0.98       347
+           1       0.84      0.85      0.85       321
+           2       0.89      0.84      0.87       332
+
+    accuracy                           0.90      1000
+   macro avg       0.90      0.90      0.90      1000
+weighted avg       0.90      0.90      0.90      1000
+
+Confusion Matrix:
+ [[347   0   0]
+ [ 13 273  35]
+ [  0  52 280]]
+KNeighbors:
+
+[ ]
+# Knn Neighbours
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score,f1_score, classification_report, confusion_matrix
+
+# model
+knn_model = KNeighborsClassifier()
+knn_model.fit(X_train_scaled, Y_train)
+
+# prediction
+knn_Y_pred = knn_model.predict(X_test_scaled)
+
+# find accuracy and f1 score
+knn_accuracy_score = accuracy_score(Y_test, knn_Y_pred)
+knn_F1_score = f1_score(Y_test, knn_Y_pred, average='weighted')
+
+# results
+print(f'Accuracy score for KNN: {knn_accuracy_score}')
+print(f'F1 Score: {knn_F1_score}')
+print(f'Classification Report:\n {classification_report(Y_test, knn_Y_pred)}')
+print(f'Confusion Matrix:\n {confusion_matrix(Y_test, knn_Y_pred)}')
+
+Accuracy score for KNN: 0.625
+F1 Score: 0.6252660131461607
+Classification Report:
+               precision    recall  f1-score   support
+
+           0       0.66      0.75      0.70       347
+           1       0.49      0.51      0.50       321
+           2       0.74      0.61      0.67       332
+
+    accuracy                           0.62      1000
+   macro avg       0.63      0.62      0.62      1000
+weighted avg       0.63      0.62      0.63      1000
+
+Confusion Matrix:
+ [[260  72  15]
+ [101 163  57]
+ [ 31  99 202]]
+Gaussian Naive Bayes:
+
+[ ]
+# Gaussian Naive Bayes
+# import
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score,f1_score, classification_report, confusion_matrix
+
+# model fit
+gnb_model = GaussianNB()
+gnb_model.fit(X_train_scaled, Y_train)
+
+# prediction
+gnb_Y_pred = gnb_model.predict(X_test_scaled)
+
+# find accuracy and f1 score
+gnb_accuracy_score = accuracy_score(Y_test, gnb_Y_pred)
+gnb_F1_score = f1_score(Y_test, gnb_Y_pred, average='weighted')
+
+# results
+print(f'Accuracy score for Gaussian Naive Bayes: {gnb_accuracy_score}')
+print(f'F1 Score: {gnb_F1_score}')
+print(f'Classification Report:\n {classification_report(Y_test, gnb_Y_pred)}')
+print(f'Confusion Matrix:\n {confusion_matrix(Y_test, gnb_Y_pred)}')
+
+Accuracy score for Gaussian Naive Bayes: 0.798
+F1 Score: 0.7967019047619046
+Classification Report:
+               precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00       347
+           1       0.66      0.78      0.71       321
+           2       0.74      0.61      0.67       332
+
+    accuracy                           0.80      1000
+   macro avg       0.80      0.79      0.79      1000
+weighted avg       0.80      0.80      0.80      1000
+
+Confusion Matrix:
+ [[347   0   0]
+ [  0 249  72]
+ [  0 130 202]]
+Gradient Boost:
+
+[ ]
+# Gradient Boosting
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import accuracy_score,f1_score, classification_report, confusion_matrix
+
+# model fit
+gb_model = GradientBoostingClassifier()
+gb_model.fit(X_train_scaled, Y_train)
+
+# prediction
+gb_Y_pred = gb_model.predict(X_test_scaled)
+
+# find accuracy and f1 score
+gb_accuracy_score = accuracy_score(Y_test, gb_Y_pred)
+gb_F1_score = f1_score(Y_test, gb_Y_pred, average='weighted')
+
+# results
+print(f'Accuracy score for Gradient Boost: {gb_accuracy_score}')
+print(f'F1 Score: {gb_F1_score}')
+print(f'Classification Report:\n {classification_report(Y_test, gb_Y_pred)}')
+print(f'Confusion Matrix:\n {confusion_matrix(Y_test, gb_Y_pred)}')
+
+Accuracy score for Gradient Boost: 0.986
+F1 Score: 0.9859980290203292
+Classification Report:
+               precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00       347
+           1       0.98      0.97      0.98       321
+           2       0.97      0.98      0.98       332
+
+    accuracy                           0.99      1000
+   macro avg       0.99      0.99      0.99      1000
+weighted avg       0.99      0.99      0.99      1000
+
+Confusion Matrix:
+ [[347   0   0]
+ [  0 312   9]
+ [  0   5 327]]
+As of now, seven models have been built, and accuracy scores, F1 scores, and classification reports have been calculated. We can easily decide which model performed best in this dataset.
+
+Model Evaluation and Comparison:
+Comparison for accuracy score:
+
+[ ]
+
+# comaparing each models with the accuracy values
+models_accuracy = {
+    'Logistic Regression': lr_accuracy_score,
+    'Decision Tree': dt_accuracy_score,
+    'Random Forest': rf_accuracy_score,
+    'Support Vector Machine': svm_accuracy_score,
+    'KNeighbors': knn_accuracy_score,
+    'Gaussian Naive Bayes': gnb_accuracy_score,
+    'Gradient Boost': gb_accuracy_score
+}
+
+
+Accuracy_Score = pd.DataFrame(list(models_accuracy.items()), columns=['Model', 'Accuracy_Score'])
+Accuracy_Score.sort_values(by='Accuracy_Score', ascending=False)
+print(f'Accuracy Score:\n {Accuracy_Score}')
+Accuracy Score:
+                     Model  Accuracy_Score
+0     Logistic Regression           0.914
+1           Decision Tree           0.874
+2           Random Forest           0.944
+3  Support Vector Machine           0.900
+4              KNeighbors           0.625
+5    Gaussian Naive Bayes           0.798
+6          Gradient Boost           0.986
+Visualization for accuracy score:
+
+[ ]
+# visualization for accuracy score
+plt.figure(figsize=(10, 6))
+sns.barplot(x='Model', y='Accuracy_Score', data=Accuracy_Score)
+plt.title('Accuracy Score Comparison')
+plt.xlabel('Model')
+plt.ylabel('Accuracy Score')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+Comparison for F1 score:
+
+[ ]
+# comparing each models with f1 score
+models_f1_score = {
+    'Logistic Regression': lr_f1_score,
+    'Decision Tree': dt_f1_score,
+    'Random Forest': rf_f1_score,
+    'Support Vector Machine': svm_F1_score,
+    'KNeighbors': knn_F1_score,
+    'Gaussian Naive Bayes': gnb_F1_score,
+    'Gradient Boost': gb_F1_score
+}
+
+F1_Score = pd.DataFrame(list(models_f1_score.items()), columns=['Model', 'F1_Score'])
+F1_Score.sort_values(by='F1_Score', ascending=False)
+print(f'F1 Score:\n {F1_Score}')
+
+F1 Score:
+                     Model  F1_Score
+0     Logistic Regression  0.914006
+1           Decision Tree  0.868664
+2           Random Forest  0.943897
+3  Support Vector Machine  0.899286
+4              KNeighbors  0.625266
+5    Gaussian Naive Bayes  0.796702
+6          Gradient Boost  0.985998
+Visualization for F1 score:
+
+[ ]
+# Visualization for F1 score
+plt.figure(figsize=(10, 6))
+sns.barplot(x='Model', y='F1_Score', data=F1_Score)
+plt.title('F1 Score Comparison')
+plt.xlabel('Model')
+plt.ylabel('F1 Score')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+Conclusion:
+The analysis suggests that remote work can positively impact mental health, stress levels, and job satisfaction for many employees. However, it's essential to address potential challenges and tailor strategies to ensure the well-being of all workers in the evolving landscape of remote work.
+
+Accuracy Score and F1 Score:
+
+Gradient Boosting achieved a perfect score (0.986), which might indicate the data are well-distributed.
+
+Random Forest and Logistic Regression also performed very well (0.944 and 0.914), which is expected since these are powerful classifiers.
+
+Decision Tree and Support Vector Machine are slightly lower than the above.
+
+Gaussian Naive Bayes and especially KNeighbors had notably lower accuracy and f1 score suggesting they may not be well-suited for the data or might require tuning.
+
+For deployment or further analysis, Gradient Boosting should be the model of choice due to its superior predictive performance.The models were trained to predict satisfaction with remote work based on features like stress, balance, sleep, support, and more.
+
+Employee satisfaction with remote work is influenced by a combination of work-life balance, social isolation, company support, and meeting overload. The best-performing predictive model (Gradient Boosting) can accurately classify satisfaction levels, making it a powerful tool for HR analytics.
+
+For improved satisfaction with remote work,mental health condition and stress level organizations should focus on minimizing unnecessary meetings, enhancing remote support infrastructure, and monitoring employee well-being through measurable indicators.
+
+Colab paid products - Cancel contracts here
